@@ -27,3 +27,21 @@ jobs:
 
       - name: Lancer la vérification
         run: npm run lint && npm test
+
+      # Notification Discord succès
+      - name: Notifier Discord - Succès
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\":\"✅ CI réussie pour le workflow **CI** sur la branche ${GITHUB_REF##*/}.\nAuteur: ${GITHUB_ACTOR}\nLien: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # Notification Discord échec
+      - name: Notifier Discord - Échec
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\":\"❌ CI échouée pour le workflow **CI** sur la branche ${GITHUB_REF##*/}.\nAuteur: ${GITHUB_ACTOR}\nLien: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
